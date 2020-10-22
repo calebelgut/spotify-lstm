@@ -185,5 +185,125 @@ From our models, we must make a determination of which features to send out for 
 
 # Time Series Analysis with ARIMA Models:
 
+This second half of the project dealt with Time Series Analysis. A review on Time Series Analysis would show us that Time Series Data refers to any dataset where the progress of time is an important dimension in the dataset. **Our job in this endeavor is to use the previous 100 years of data to predict the prevalence of the four most popular and most niche features that we identified during classification.** We will predict the prevalence of this data over the next five years. 
+
+## Step One: Helper Functions
+
+I began this section of the project by creating most of the functions that I would be using during my workflow. I would eventually create a time series model for each individual feature (8 in total) and wanted to have a streamlined method to approach this task. 
+
+I created helper functions for: 
+1. DataFrame Normalization (would only be used once)
+1. Splitting the Data into Train & Test
+1. Fitting the ARIMA Model
+1. Finding the Train & Test RMSE for Model Validation
+1. Forecasting Future Information
+
+![helper_function_1](/readme_images/helper_function_1.jpg)
+![helper_function_2](/readme_images/helper_function_2.jpg)
+![helper_function_3](/readme_images/helper_function_3.jpg)
+![helper_function_4](/readme_images/helper_function_4.jpg)
+
+## Step Two: Read in the Data & Transform Into Time Series 
+
+After reading in the data, my first task was to create two new dataframes: one that would have the yearly average of the four most popular features and one that would have the yearly average of the four most niche features.  
+
+![new_df](/readme_images/new_df.jpg)
+
+When I plotted the initial time series of the new dataframes, it became clear very quickly that normalization would be necessary. The loudness column had measurements at a very different scale than energy, valence, and acousticness. This disparity made the initial time series very difficult to read. Take a look at the difference between the time series with loudness and without it: 
+
+![with_loudness](/readme_images/with_loudness.jpg)
+![without_loudness](/readme_images/without_loudness.jpg)
+
+## Step Three: Bask in the Glory of Normalized Data
+
+With our dataframes normalized, let's take a look at them and see if we can gain preliminary understanding of their movement before we break each individual feature down into a time series: 
+
+![normalized](/readme_images/normalized.png)
+
+Here, it seems that loudness and energy are on the rise and have been since the 50s but have experienced a substantial rise since the 80s. This seems to correlate with the fall of acousticness which was very prevalent between 1920 and 1950. Ever since 1950, however, the prevalence of acousticness has shrunk substantially. Songs with a cheerful disposition (high **valence**) seem to have peaked in the 80s which would make sense given that decade as an era of disco & synth followed by the grunge & pop punk of the 90s. It may, however, be on the rise again.
+
+![normalized_niche](/readme_images/normalized_niche.png)
+
+As far as the niche features are concerned we can see, here, that songs with a *major scale* (**mode**) hit a peak between 1960 and 1970. Since that era, a majority of songs have steadily approached the minor scale with a peak in that regard in 2020. **Speechiness** had its heyday in the 1930s and hasn't reached the same peak since. It had its fall from grace post-1950s and, since then, we haven't seen too much of it until recently. **Tempo** had a major rise between the 60s and the 80s and then hit a bit of a dip between the 80s and 00s, and is now on the rise again! **Liveness** hasn't been seen too much since the late 70s & early 80s. 
+
+## Step Four: Prepare Data for Time Series Analysis
+
+With everything visualized and given an initial analysis, I needed to get to work on separating these features and creating a time series for each. The first step of this was to change the column 'year' into DateTime Format--a format that can be read by the time series models--and I then needed to set the index as the datetime. Setting the index as the datetime removes the datetime from analysis and, rather, allows the target feature to be analyzed by the model with the indexed DateTime keeping our data in order! 
+
+![data_prep_ts](/readme_images/data_prep_ts.jpg)
+
+## Step Five: Separate each column into its own time series
+
+With our data all prepped and ready to go the final step before modelling is to separate each feature into its own time series. The first step for this is to create a list of dataframes (one list for popular features and one list for niche features) and, from there, instantiate individual time series for each of the features.
+
+![pop_df](/readme_images/pop_df.jpg)
+
+![instantiate](/readme_images/instantiate.jpg)
+
+## Step Six: Establish Workflow and Get to Work
+
+Since I repeated the same process for each of our 8 features, I will only be touching on the models that performed the best and give a conclusive analysis at the end before moving on to LSTMs. It is important to note, however, that there was a steady workflow for each model's creation. It is as follows: 
+
+### Workflow for Our Models:
+
+1. Visualize the Time Series
+1. Use auto_arima to find the best order & seasonal order (if it exists) for the ARIMA (or SARIMA) model
+1. Fit the model
+1. Examine results & residual analysis
+1. Use the train & test RMSE for validation
+1. Forecast future values
+1. Repeat for each additional time series 
+
+### Note About the AIC:
+
+In the models I built I received one result, in particular, that was different from my previous experiences with time series models: **The AICs I received when searching for the best order & seasonal order for my models were often negative.** Initially, this worried me as I hadn't encountered negative AICs before however, according to William H. Greene, the Robert Stansky Professor of Economics and Statistics at Stern School of Business at NYU, 
+
+*"The sign of the AIC tells you absolutely nothing about ill conditioned parameters or whether the model is suitable or not. For example, in a linear regression case, if the AIC is positive, you can make it negative (or vice versa) just by multiplying every observation on the dependent variable by the same number. That obviously does not change the characteristics of the model."*
+
+This, to me, says that a negative AIC is fine, as we are still looking for the lowest possible value. Unlike positive AICs where we are looking for the number closest to zero, with negative AICs we simply flip that strategy and search for the AIC furthest from zero. 
+
+## Example Workflow Visualized: 
+
+If judging by lowest RMSE & similar RMSE between train & test groups, the best ARIMA model was the one made from the loudness time series. The following are the steps taken to build & forecast with this model:
+
+### Visualize the Time Series:
+
+![loudness_viz](/readme_images/loudness_viz.png)
+
+### Use auto_arima to find the best order & seasonal order (if it exists) for the ARIMA (or SARIMA) model
+
+![loudness_auto_arima](/readme_images/loudness_auto_arima.jpg)
+
+### Fit the Model, Examine Results, Examine Residuals
+
+![loudness_results](/readme_images/loudness_results.jpg)
+
+![loudness_errors](/readme_images/loudness_errors.png)
+
+### Validate with Train & Test RMSE
+
+![loudness_train_rmse](/readme_images/loudness_train_rmse.png)
+
+![loudness_test_rmse](/readme_images/loudness_test_rmse.png)
+
+### Forecast 
+
+![loudness_forecast](/readme_images/loudness_forecast.jpg)
+
+## Other Measures to Determine Best Model?
+
+If one was to visually examine the residuals and use this to determine a best model, that model would be the one built on the mode time series. Here is the residual analysis for that model--unfortunately the RMSE was considerably higher: train & test were both closer to 0.1 as opposed to the 0.048 from both the train & test RMSE of the loudness model. 
+
+![mode_errors](/readme_images/mode_errors.png)
+
+## Step Seven: When Finished Modelling, Compile Results and Give Conclusive Analysis: 
+
+While the big conclusion will come after we complete the LSTM analysis, the conclusions thus far are as follows: 
+
+### Conclusion for Popular Features: The prevalence of Loudness & Energy will grow the most of the 4 features that most likely predict popularity.
+
+If you are an executive looking to emphasize certain features in the artists sponsored by your label, you may want to pursue these features if following trends is your thing however if you are looking to break the mold, investing in acoustic artists may be ideal as the prevalence of acousticness is quite low right now.
+
+
 
 
