@@ -163,6 +163,14 @@ Similarly to our situation with analyzing all features, the grid-searched random
 
 - **Analysis:**
     - Nearly highest in every category except recall (The Untuned Decision Tree has that honor) however this model is still the best for showing us which features will predict popularity because the AUC in this model is much higher and can therefore be trusted when it comes to differentiating between classes (Not Popular or Popular)
+    
+- **Before we go:**
+
+Here is the progression of AUCs as told through three of the many models that were created. You will see the AUC for an untuned Decision Tree trained on all columns, a manually tuned decision tree trained on all columns, and our grid searched random forest that you saw above:
+
+![dt_auc](/readme_images/dt_auc.png)
+![dt_tune_auc](/readme_images/dt_tune_auc.png)
+![gs_all_AUC](/readme_images/auc_gs_ran_for.png)
 
 # What Comes Next?
 
