@@ -101,30 +101,30 @@ I will be showing the results from a few of my best models in a moment but befor
 
 **When not Grid-Searching**: 
 
-Step One: Create the Classifier--as an option before this step you can choose to manually tune your model--and attach the appropriate hyperparameters.
+**Step One**: Create the Classifier--as an option before this step you can choose to manually tune your model--and attach the appropriate hyperparameters.
 
-Step Two: Fit the model to the training data
+**Step Two**: Fit the model to the training data
 
-Step Three: Create a variable called "y_pred" which uses your new fit model to predict on the X_test data
+**Step Three**: Create a variable called "y_pred" which uses your new fit model to predict on the X_test data
 
-Step Four: Create and print a confusion matrix and a classification report. 
+**Step Four**: Create and print a confusion matrix and a classification report. 
 
 - The confusion matrix shows you how many correct positive & negatives as well as how many false positives and negatives your model acquired. 
 
-Step Five: Calculate the AUC
+**Step Five**: Calculate the AUC
 
 - The AUC is the measure of the ability of a classifier to distinguish between classes and is used as a summary of the ROC curve
   - The ROC curve shows the trade-off between sensitivity (or True Positive Rate) and specificity (1 – False Positive Rate). Classifiers that give curves closer to the top-left corner indicate a better performance.
   - Because the ROC does not depend on the distribution of classes, it is very helpful with a class imbalance problem. Because there are far more unpopular songs than popular songs in our dataframe, the ROC & AUC will be incredibly helpful in aiding me in choosing the best models for classification purposes.
 
-Step Six: Report Important Values & Repeat
+**Step Six**: Report Important Values & Repeat
 - The most important values for us when evaluating our models are: 
-  - F1: The balance between Recall & Precision
-  - Recall: The number of relevant items retrieved by a search divided by the total number of existing relevant items.
-  - Precision: The number of relevant items retrieved by a search divided by the total number of items retrieved by that search.
-  - AUC: Already explained. 
-- A higher recall means we are going to assume that more tracks will turn up positive for popularity. This gives us a higher rate of false positives. This may lead our business associates to invest in the wrong features and, ultimately, the wrong artists which could cause a long-term loss for them.
-- On the other hand, a higher precision means our model's threshold for what it will consider a prediction of popularity will be higher. This gives us a higher rate of false negatives as some songs with feature prevalence that would accurately predict popularity may not be noted as such by the model. This may result in an increased amount of frustrated & annoyed artists however it does not put the record label in danger of losing money. A high precision is what we will aim for--this will be particularly effective for those executives who are looking to take less risk. 
+  - **F1**: The balance between Recall & Precision
+  - **Recall**: The number of relevant items retrieved by a search divided by the total number of existing relevant items.
+  - **Precision**: The number of relevant items retrieved by a search divided by the total number of items retrieved by that search.
+  - **AUC**: Already explained. 
+- A higher recall means we are going to assume that *more tracks will turn up positive for popularity*. This gives us a higher rate of *false positives*. This may lead our business associates to invest in the wrong features and, ultimately, the wrong artists which could cause a long-term loss for them.
+- On the other hand, a *higher precision means our model's threshold for what it will consider a prediction of popularity will be higher*. This gives us a higher rate of *false negatives* as some songs with feature prevalence that would accurately predict popularity may not be noted as such by the model. This may result in an increased amount of frustrated & annoyed artists however it does not put the record label in danger of losing money. A high precision is what we will aim for--this will be particularly effective for those executives who are looking to take less risk. 
 
 ## Visualizing the Best Models:
 
@@ -136,15 +136,13 @@ Step Six: Report Important Values & Repeat
 
 ![gs_all_top_feats](/readme_images/important_feats_gs_ran_for.png)
 
-![rf_5trees](/readme_images/rf_5trees.png)
-
 **Analysis:**
 
 - Scores the highest in nearly every important category:
-    - Highest F1 means that we have the best balance between Recall & Precision
-    - Second Highest Precision of 0.68 & Second Highest Recall of 0.45 means that our model will not have a very high rate of either false negatives or false positives. 
+    - **Highest F1** means that we have the best balance between Recall & Precision
+    - **Second Highest Precision** of 0.68 & **Second Highest Recall** of 0.45 means that our model will not have a very high rate of either false negatives or false positives. 
         - In the end, Precision is the more important factor especially when pitching to executives as we will want to ensure that our model is giving us fewer false positives however it is good to see a model with a strong balance of both.
-    - Highest AUC of 0.848 means that our model is best at telling the difference between classes. Since there is a fairly strong class imbalance, here, this may be the most important component when deciding which model is the best for our predictions. 
+    - **Highest AUC** of 0.848 means that our model is best at telling the difference between classes. Since there is a fairly strong class imbalance, here, this may be the most important component when deciding which model is the best for our predictions. 
     - Accuracy is the fraction of predictions our model got right! It isn't the best predictor for a classification model however it is worth pointing out that this model had the highest accuracy.
 
 After the above feature ranking, I ran another series of classification analyses on the top 7 features as determined by the above model. Of these models, the grid-searched random forest was, once again, the winner! It is visualized below:
@@ -156,10 +154,6 @@ After the above feature ranking, I ran another series of classification analyses
 ![auc_gs_ran_for_top](/readme_images/auc_gs_ran_for_top.jpg)
 
 ![important_feats_gs_ran_for_top](/readme_images/important_feats_gs_ran_for_top.png)
-
-For fun, let's check out a visualization of the 5 trees from this Random Forest
-
-![rf_5trees](/readme_images/rf_5trees.png)
 
 Similarly to our situation with analyzing all features, the grid-searched random forest comes out on top.
 
@@ -194,11 +188,11 @@ This second half of the project dealt with Time Series Analysis. A review on Tim
 I began this section of the project by creating most of the functions that I would be using during my workflow. I would eventually create a time series model for each individual feature (8 in total) and wanted to have a streamlined method to approach this task. 
 
 I created helper functions for: 
-1. DataFrame Normalization (would only be used once)
-1. Splitting the Data into Train & Test
-1. Fitting the ARIMA Model
-1. Finding the Train & Test RMSE for Model Validation
-1. Forecasting Future Information
+1. **DataFrame Normalization** (would only be used once)
+1. **Splitting the Data into Train & Test**
+1. **Fitting the ARIMA Model**
+1. **Finding the Train & Test RMSE for Model Validation**
+1. **Forecasting Future Information**
 
 ![helper_function_1](/readme_images/helper_function_1.jpg)
 ![helper_function_2](/readme_images/helper_function_2.jpg)
