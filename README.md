@@ -136,6 +136,8 @@ Step Six: Report Important Values & Repeat
 
 ![gs_all_top_feats](/readme_images/important_feats_gs_ran_for.png)
 
+![rf_5trees](/readme_images/rf_5trees.png)
+
 **Analysis:**
 
 - Scores the highest in nearly every important category:
@@ -302,8 +304,172 @@ While the big conclusion will come after we complete the LSTM analysis, the conc
 
 ### Conclusion for Popular Features: The prevalence of Loudness & Energy will grow the most of the 4 features that most likely predict popularity.
 
+![pop_features_analysis](/readme_images/pop_features_analysis.jpg)
+
 If you are an executive looking to emphasize certain features in the artists sponsored by your label, you may want to pursue these features if following trends is your thing however if you are looking to break the mold, investing in acoustic artists may be ideal as the prevalence of acousticness is quite low right now.
 
+### Conclusion for Niche Features: Include Speechiness & a Major Scale to stand out 
 
+![niche_features_analysis](/readme_images/niche_features_analysis.jpg)
+
+If you are an artist looking to tap into features that don't necessarily correlate with popularity (think Top 40 Radio Hits) then this information may be pertinent in your decision-making for the direction of your music. 
+
+Tempo is on trend to increase dramatically more than the other features (i.e.: Songs with higher tempo will continue to be prevalent.) however speechiness will be rarely used and does not necessarily predict popularity. If you're willing to break the mold in your cohort and your goal isn't necessarily world fame, this may be a feature to include in your song. If you're the type of person who doesn't care about popularity, you may not necessarily care about what I have to say here *however* if you are an artist who includes speechiness in their music, a la Johnny Cash, rest assured that there will not be many artists like you out there. 
+
+## So..Once Again, Which Was the Best Model?
+
+- *If judging by RMSE*: **Loudness**.
+    - Its training RMSE was 0.047 and its test RMSE was 0.048
+        - There were other RMSEs that were slightly lower but this model had its RMSE for train & test the closest together while also being very low
+- *If judging by visual analysis of residuals*, I would go with the **Mode** model. 
+    - If you analyze the histogram in particular you can see that the errors are normalized which means the model is using almost the entire signal of the information provided. This means there may be low error in the model.
+
+# LSTM Time! 
+
+Before we wrap up our analysis, I wanted to work with a neural network to see if I could acquire an even lower RMSE and, therefore, an even better model to analyze our time series data. 
+
+## Background on RNNs and LSTMs
+
+To understand an LSTM, one must first understand an RNN (Recurrent Neural Network) as an LSTM is a more complex version of an RNN. 
+
+Recurrent Neural Networks are neural networks that are adept at modeling sequence data. 
+- What does that mean?
+  - Say you take a still snapshot of a ball moving through time and want to predict its next move.
+    - How do you do this?
+    - We need knowledge of where the ball has been to predict its next move!
+      - We can use many snapshots in succession of where the ball has been! These snapshots give us a sequence that will then inform us on the ball's next direction.
+        - **This is Sequence Data!**
+- Sequence Data comes in many forms: Audio, Text, etc. 
+- RNNs are very good at processing sequence data for prediction!
+  - How?
+    - Sequential Memory!
+    - You can try an example of this right now: try saying the alphabet in your head. 
+      - It is easy to do with the sequence you were trained on but it is tougher to do so backwards.
+      - In fact, try beginning at G. Even tougher, right? 
+  - Sequential memory helps you brain recognize sequence patterns. Neural networks in computers work the same way. 
+- Example of an RNN: A chat bot that understands intentions based on user's inputted text:
+  - Step One is to encode a sequence of texts using RNN
+    - Then we feed RNN output into something called a Feed Forward Neural Network which will classify intent
+  - Imagine our user types "What time is it?"
+    - RNN's first job is to encode "What" and produce an output.
+    - Next, our RNN encodes "Time" as well as a hidden state from the previous step
+      - The hidden state represents information from all the previous steps. 
+    - This is repeated until the final step.
+      - By the final step, the RNN has encoded information from all previous steps.
+    - Since the final output is created from the rest of our sequence (when we encode "?" we are also including pieces of information from each word in our sentence) we can take the final output and pass it to the feed forward layer to classify an intent. 
+- Why use an LSTM when we can just use an RNN?
+  - The Vanishing Gradient
+    - As the RNN processes steps it has trouble retaining info from all but the most recent previous steps. 
+      - This is due to something called back propagation.
+        - To understand back propagation I'll quickly walk you through the three major steps of training a neural network:
+          - A "forward pass" (the encoding process I described above) makes a prediction
+          - The prediction is compared to ground truth using a loss function
+            - The loss function outputs an error value
+          - The error value is used in back propagation which calculates a gradient for each node in the neural network
+            - The gradient adjusts the network's internal weights allowing the network to learn
+            - The bigger the gradient the bigger the adjustment to the weights
+            - Here is where our problem lies:
+              - When doing back propagation, each node calculates gradient with respect to gradients in a layer before it
+              - If the gradient in the layer before it is small, current adjustments will be **even smaller**.
+              - This causes gradients to exponentially shrink as back propagation continues
+              - **Earlier layers fail to do any learning as the internal weights are barely adjusted due to extremely small gradient**.
+- Returning to our above example:
+  - Because of a vanishing gradient, it is possible that the words "What" and "Time" are not considered when predicting user intention in our example of **What Time Is It?**
+    - The model would use its best guess with "is it ?"
+- **LSTMs To the Rescue!**
+  - An LSTM is a specialized RNN that is capable of long term dependency using **gates.**
+  - The gates are *different tensor operations that can learn what information to add or remove from a hidden state.*
+  - A great way to summarize an LSTM:
+    - When you read a review for a film you don't remember every word, just the information relevant enough to let you know if the critic liked it or not! You don't remember every "is" or "the", you remember words like "splendid" or "terrible." 
+  - LSTMs use gates to forget information they deem irrelevant and keep, over a long period of time, information they deem to be relevant. 
+    - Relevance, or a lack thereof, is determined through three gates: A Forget Gate, An Input Gate, and an Output Gate
+      - I won't dive into the math but suffice it to say that a sigmoid function helps our forget gate determine which info should be thrown away or kept and both tan & sigmoid functions are used in the input gates to determine which values will be pushed on through to the output gate. 
+
+- Finally, why use an LSTM instead of an ARIMA model for time series analysis? 
+  - Simply put, an LSTM can use a lot more data to generate predictions than an ARIMA model. It won't always be more accurate but it is good to not solely rely on ARIMA during time series analysis. 
+
+# Apologies for the Lesson, on to our LSTM
+
+## First Step: Concatenate the Four DataFrames in df_ts (the 4 popular features' time series) and Build a Network with These Features
+
+![df_tss](/readme_images/df_tss.jpg)
+
+## Second Step: Use Alternative Code to Train-Test Split
+
+![alt_train_test](/readme_images/alt_train_test.jpg)
+
+This method received the same result as a normal train-test split, I just wanted to try using different code. 
+
+## Third Step: Write a Function to Create a Dataset for the X & y Train & Test
+
+This function is important because it involves time steps which will be key to our LSTM
+
+![create_dataset](/readme_images/create_dataset.jpg)
+
+## Fourth Step: Separate our Train & Test into X & y groups
+
+Our X's shape will be (samples, time_steps, features) and our y will only have (samples,)
+
+![x_y](/readme_images/x_y.jpg)
+
+## Build the Model:
+
+1. Because it is Time Series we will use the Sequential Method from Keras
+1. We will specify an LSTM for our Input Layer with 64 Units, we turn our return_sequences on, and we ensure a correct shape
+1. Our second layer will have 32 units
+1. Our Dropout layer is important as it will penalize a more complex model. We set it to 0.25.
+1. Finally our output layer will be Dense (1 Unit signifies this is our output layer)
+
+![lstm](/readme_images/lstm.jpg)
+
+### Once the model is built, but before it is fit, we will compile the model.
+
+- Compiling simply means we are configuring the model with losses and metrics.
+    - We are measuring loss as mean squared error
+    - Our optimizer is Adam which is a stochastic gradient descent method that is based on adaptive estimation of first-order and second-order moments.
+        - In other words, Adam provides an optimization algorithm that can handle sparse gradients on noisy problems. 
+    - The learning rate is set to 0.01, the learning rate is a hyperparameter that controls how much to change the model in response to the estimated error each time the model weights are updated.
+    
+![lstm_compile](/readme_images/lstm_compile.jpg)
+
+## Let the LSTM magic begin! 
+
+- We set our epochs to 40
+    - One Epoch is when an entire dataset is passed forward and backward through the neural network only once. 
+- We set our batch size to 10
+    - The batch size is the number of samples that will be propagated through the network.
+- Our validation split is 0.1
+    - Keras proportionally split your training set by the value of the variable. The first set is used for training and the 2nd set for validation after each epoch.
+- Shuffle is set to False because this is a time series model and so we want our data in order.
+
+![lstm_fit](/readme_images/lstm_fit.jpg)
+
+### Model Train v. Validation Loss
+
+![train_v_val](/readme_images/train_v_val.png)
+
+It is a good sign to see overlap with our train & validation loss. After this we will visualize a prediction v. ground truth and then compare that visualization to the historic data. 
+
+![energy_prev_pred](/readme_images/energy_prev_pred.png)
+
+Here we can see that there is still some work to do to get our predictions accurate with ground truth however the end points of both our predictions and the truth are quite close which means this model is doing a pretty good job making its predictions. 
+
+![big_history_boi](/readme_images/big_history_boi.png)
+
+Looking at our model compared to historical data, it seems to follow the trend fairly well. I would put a solid amount of trust in it and with more experience in LSTMs I may one day choose them over ARIMAs. For now, however, I still remain more confident in the ARIMA time series models.
+
+# Future Research?
+
+I would like to reexamine this data but include months. This analysis didn't include them because many of the release dates (all but around 10,000 or so) only included the release year. In the future I may return to this analysis and only use those songs which have a full release date of month, day, and year. I feel like this would vastly improve the models' accuracy as we would have more values to choose from. If I could use monthly_avg instead of yearly_avg I'd have had 1,200 values in each time series instead of 100. 
+
+# Final Recommendations:
+
+Music Executives, invest in energy & loudness!
+
+Independent Artists, invest in speechiness & songs with a major scale! 
+
+# Thank You
+
+Many thanks to everyone at Flatiron for giving me an incredible five months of brutal but amazing fast-paced data science learning. Many thanks to my 052620 cohort and to our technical coach Abhineet. Thank you to all of the staff who made all this possible! 
 
 
