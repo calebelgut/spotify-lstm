@@ -5,6 +5,10 @@
 
 This project combines Classification & Time Series analysis to gain a deep understanding of those features of a song which would be most likely to either **predict popularity** or **predict nicheness.** After conducting a classification analysis to solve this problem, I ran a time series analysis to predict the prevalence of these features over the next five years. These predictions will help guide two groups of people: music executives and independent artists. The results will guide music executives who are looking to invest in certain elements of music while shaping their artists into further popularity. The results will also help independent artists understand which features are used the least and don't traditionally predict popularity--perhaps these artists can use the rarity of these features to their advantage in an attempt to stand out.
 
+## Libraries Used:
+
+Pandas, Matplotlib, Seaborn, Numpy, sklearn, math, statsmodels, warnings, itertools, keras
+
 ## Summary of DataFrame
 
 The dataframe consists of nearly 170,000 songs released between 1921 and 2020 from Spotify's API. Each song is broken down into a myriad of factors all measured by algorithms provided by Spotify. These algorithms measure everything from reasonably-quantifiable factors such as duration, key, and loudness (measured by decibel) to factors one wouldn't initially think were quantifiable such as the level of energy in a song or its cheerfulness.
