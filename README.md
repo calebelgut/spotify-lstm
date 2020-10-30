@@ -476,6 +476,4 @@ Independent Artists, invest in speechiness & songs with a major scale!
 
 # Thank You
 
-Many thanks to everyone at Flatiron for giving me an incredible five months of brutal but amazing fast-paced data science learning. Many thanks to my 052620 cohort and to our technical coach Abhineet. Thank you to all of the staff who made all this possible! 
-
 
