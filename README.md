@@ -155,7 +155,7 @@ After the above feature ranking, I ran another series of classification analyses
 
 ![grid_search_ran_forest_top_cm](/readme_images/grid_search_ran_forest_top_cm.jpg)
 
-![auc_gs_ran_for_top](/readme_images/auc_gs_ran_for_top.jpg)
+![auc_gs_ran_for_top](/readme_images/auc_gs_ran_for_top.png)
 
 ![important_feats_gs_ran_for_top](/readme_images/important_feats_gs_ran_for_top.png)
 
