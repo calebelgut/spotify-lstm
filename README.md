@@ -219,8 +219,8 @@ After reading in the data, my first task was to create two new dataframes: one t
 
 When I plotted the initial time series of the new dataframes, it became clear very quickly that normalization would be necessary. The loudness column had measurements at a very different scale than energy, valence, and acousticness. This disparity made the initial time series very difficult to read. Take a look at the difference between the time series with loudness and without it: 
 
-![with_loudness](/readme_images/with_loudness.jpg)
-![without_loudness](/readme_images/without_loudness.jpg)
+![with_loudness](/readme_images/with_loudness.png)
+![without_loudness](/readme_images/without_loudness.png)
 
 ## Step Three: Bask in the Glory of Normalized Data
 
